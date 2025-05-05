@@ -1,6 +1,6 @@
 # AWS Service MCP Generator
 
-A Python library that automatically generates MCP (Machine Conversation Protocol) servers for any AWS service that has a boto3 client. This tool simplifies the process of creating AI-powered interfaces for AWS services.
+A Python library that automatically generates MCP servers for any AWS service that has a boto3 client.
 
 ## Installation
 
