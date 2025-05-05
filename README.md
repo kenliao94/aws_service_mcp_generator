@@ -83,6 +83,26 @@ tool_configuration = {
     },
     "delete_topic": {
         "ignore": True  # Skip this operation
+    },
+    "publish": {
+        # Complete override of the function behavior
+        "func_override": lambda mcp, boto3_client_getter, operation: mcp.tool(description="Enhanced SNS publish with additional logging")(
+            async def publish_with_logging(message: str, topic_arn: str, region: str = "us-east-1"):
+                """Publish a message to an SNS topic with additional logging"""
+                try:
+                    client = boto3_client_getter(region)
+                    print(f"Publishing message to {topic_arn} in {region}")
+                    response = client(operation)(Message=message, TopicArn=topic_arn)
+                    print(f"Successfully published message with ID: {response.get('MessageId')}")
+                    return {
+                        "success": True,
+                        "message_id": response.get("MessageId"),
+                        "timestamp": str(response.get("Timestamp", ""))
+                    }
+                except Exception as e:
+                    print(f"Error publishing message: {str(e)}")
+                    return {"error": str(e)}
+        )
     }
 }
 
