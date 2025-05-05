@@ -1,13 +1,17 @@
 [project]
 name = "aws_service_mcp_generator"
-version = "1.0.2"
+version = "1.0.3"
 description = "A Python class that generates MCP server for any AWS service which has boto3 client"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     {name = "Ken Liao", email="kenliao94@gmail.com"},
+    {name = "Hashim Abusharkh", email="hashimabusharkh@gmail.com"},
 ]
-maintainers = [{ name = "Ken Liao", email = "kenliao94@gmail.com" }]
+maintainers = [
+    {name = "Ken Liao", email = "kenliao94@gmail.com" },
+    {name = "Hashim Abusharkh", email="hashimabusharkh@gmail.com"},
+]
 license = { text = "Apache-2.0" }
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
