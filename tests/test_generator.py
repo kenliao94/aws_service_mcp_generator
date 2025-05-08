@@ -41,6 +41,7 @@ class TestAWSToolGenerator(unittest.TestCase):
         self.assertEqual(generator.service_display_name, "SQS")
         self.assertEqual(generator.mcp, self.mcp_mock)
         self.assertEqual(generator.tool_configuration, {})
+        self.assertEqual(generator.skip_param_documentation, False)  # Default value
         
         # Test with tool configuration
         tool_config = {"operation1": {"ignore": True}}
@@ -52,6 +53,16 @@ class TestAWSToolGenerator(unittest.TestCase):
         )
         
         self.assertEqual(generator.tool_configuration, tool_config)
+        
+        # Test with skip_param_documentation set to True
+        generator = AWSToolGenerator(
+            service_name="sns",
+            service_display_name="SNS",
+            mcp=self.mcp_mock,
+            skip_param_documentation=True
+        )
+        
+        self.assertEqual(generator.skip_param_documentation, True)
 
     @patch("aws_service_mcp_generator.generator.boto3.Session")
     @patch("aws_service_mcp_generator.generator.botocore.session.get_session")
@@ -423,6 +434,61 @@ class TestAWSToolGenerator(unittest.TestCase):
         )
         
         self.assertEqual(generator.get_mcp(), self.mcp_mock)
+
+    @patch("aws_service_mcp_generator.generator.boto3.Session")
+    @patch("aws_service_mcp_generator.generator.botocore.session.get_session")
+    def test_skip_param_documentation(self, mock_botocore_session, mock_boto3_session):
+        """Test skip_param_documentation flag"""
+        mock_boto3_session.return_value = self.boto3_session_mock
+        
+        # Setup mock for botocore session
+        botocore_session_mock = MagicMock()
+        mock_botocore_session.return_value = botocore_session_mock
+        
+        # Setup service model mock
+        service_model_mock = MagicMock()
+        botocore_session_mock.get_service_model.return_value = service_model_mock
+        
+        # Setup operation model mock
+        operation_model_mock = MagicMock()
+        service_model_mock.operation_model.return_value = operation_model_mock
+        
+        # Setup input shape mock
+        input_shape_mock = MagicMock()
+        operation_model_mock.input_shape = input_shape_mock
+        
+        # Setup members for input shape
+        member_shape_mock = MagicMock()
+        member_shape_mock.type_name = "string"
+        member_shape_mock.documentation = "Test documentation"
+        
+        input_shape_mock.members = {"param1": member_shape_mock}
+        input_shape_mock.required_members = ["param1"]
+        
+        # Create generator with skip_param_documentation=False (default)
+        generator_with_docs = AWSToolGenerator(
+            service_name="sqs",
+            service_display_name="SQS",
+            mcp=self.mcp_mock
+        )
+        
+        # Create generator with skip_param_documentation=True
+        generator_without_docs = AWSToolGenerator(
+            service_name="sqs",
+            service_display_name="SQS",
+            mcp=self.mcp_mock,
+            skip_param_documentation=True
+        )
+        
+        # Get operation parameters for both generators
+        params_with_docs = generator_with_docs._AWSToolGenerator__get_operation_input_parameters("get_queue_url")
+        params_without_docs = generator_without_docs._AWSToolGenerator__get_operation_input_parameters("get_queue_url")
+        
+        # Verify that documentation is included when skip_param_documentation=False
+        self.assertEqual(params_with_docs[0][3], ("Test documentation",))
+        
+        # Verify that documentation is empty when skip_param_documentation=True
+        self.assertEqual(params_without_docs[0][3], ("",))
 
 
 def test_hello_world():
