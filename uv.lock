@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.10"
 
 [[package]]
@@ -27,7 +28,7 @@ wheels = [
 
 [[package]]
 name = "aws-service-mcp-generator"
-version = "1.0.0"
+version = "1.0.4"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },

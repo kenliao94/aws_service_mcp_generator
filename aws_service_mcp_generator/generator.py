@@ -14,7 +14,6 @@ BOTO3_CLIENT_GETTER = Callable[[str], boto3.client]
 OVERRIDE_FUNC_TYPE = Callable[[FastMCP, BOTO3_CLIENT_GETTER, str], None]
 VALIDATOR = Callable[[FastMCP, boto3.client, Dict[str, Any]], tuple[bool, str|None]]
 
-
 class ToolConfiguration(TypedDict):
     ignore: bool | None
     func_override: OVERRIDE_FUNC_TYPE | None
@@ -31,6 +30,7 @@ class AWSToolGenerator:
         service_display_name: str,
         mcp: FastMCP,
         tool_configuration: Dict[str, ToolConfiguration] = None,
+        skip_param_documentation: bool = False,
     ):
         """
         Initialize the AWS Service Tool
@@ -38,12 +38,14 @@ class AWSToolGenerator:
         Args:
             service_name: The AWS service name (e.g., 'sns', 'sqs')
             service_display_name: Display name for the service (defaults to uppercase of service_name)
+            skip_param_documentation: If True, parameter documentation will be skipped
         """
         self.service_name = service_name
         self.service_display_name = service_display_name or service_name.upper()
         self.mcp = mcp
         self.clients: Dict[str, boto3.client] = dict()
         self.tool_configuration = tool_configuration or dict()
+        self.skip_param_documentation = skip_param_documentation
         self.__validate_tool_configuration()
 
     def generate(self):
@@ -231,7 +233,11 @@ class AWSToolGenerator:
         res = []
         for param_name in input_shape.members.keys():
             param_shape = input_shape.members[param_name]
-            param_documentation = (getattr(param_shape, "documentation", ""),)
+            # Skip documentation if flag is set
+            if self.skip_param_documentation:
+                param_documentation = ("",)
+            else:
+                param_documentation = (getattr(param_shape, "documentation", ""),)
             is_required = param_name in input_shape.required_members
             res.append((param_name, param_shape.type_name, is_required, param_documentation))
         return res
