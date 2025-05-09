@@ -122,12 +122,6 @@ class AWSToolGenerator:
             "integer": int,
             "map": dict[Any, Any],
         }
-        type_default = {
-            "string": str(),
-            "boolean": bool(),
-            "integer": 10,
-            "map": dict(),
-        }
         try:
             input_parameters = self.__get_operation_input_parameters(operation)
             for param_tuple in input_parameters:
@@ -153,7 +147,7 @@ class AWSToolGenerator:
                                 type_conversion.get(param_type, str),
                                 Field(description=param_documentation),
                             ],
-                            default=type_default.get(param_type, str()),
+                            default=None,
                         )
                     )
             # Add region to dynamically change region such that one MCP server can interact with multiple region

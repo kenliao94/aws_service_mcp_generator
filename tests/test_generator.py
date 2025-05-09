@@ -491,6 +491,85 @@ class TestAWSToolGenerator(unittest.TestCase):
         self.assertEqual(params_without_docs[0][3], ("",))
 
 
+    @patch("aws_service_mcp_generator.generator.boto3.Session")
+    @patch("aws_service_mcp_generator.generator.botocore.session.get_session")
+    def test_annotated_field_for_optional_params(self, mock_botocore_session, mock_boto3_session):
+        """Test that optional parameters use Annotated with Field for documentation and have None as default"""
+        from typing import Annotated, get_args, get_origin
+        
+        mock_boto3_session.return_value = self.boto3_session_mock
+        
+        # Setup mock for botocore session
+        botocore_session_mock = MagicMock()
+        mock_botocore_session.return_value = botocore_session_mock
+        
+        # Setup service model mock
+        service_model_mock = MagicMock()
+        botocore_session_mock.get_service_model.return_value = service_model_mock
+        
+        # Setup operation model mock
+        operation_model_mock = MagicMock()
+        service_model_mock.operation_model.return_value = operation_model_mock
+        
+        # Setup input shape mock
+        input_shape_mock = MagicMock()
+        operation_model_mock.input_shape = input_shape_mock
+        
+        # Setup members for input shape - one required and one optional parameter
+        required_param_shape = MagicMock()
+        required_param_shape.type_name = "string"
+        required_param_shape.documentation = "Required parameter documentation"
+        
+        optional_param_shape = MagicMock()
+        optional_param_shape.type_name = "string"
+        optional_param_shape.documentation = "Optional parameter documentation"
+        
+        input_shape_mock.members = {
+            "required_param": required_param_shape,
+            "optional_param": optional_param_shape
+        }
+        input_shape_mock.required_members = ["required_param"]
+        
+        # Create generator
+        generator = AWSToolGenerator(
+            service_name="sqs",
+            service_display_name="SQS",
+            mcp=self.mcp_mock
+        )
+        
+        # Create the operation function
+        operation_func = generator._AWSToolGenerator__create_operation_function("test_operation")
+        
+        # Verify the function was created
+        self.assertIsNotNone(operation_func)
+        
+        # Get the signature parameters
+        params = operation_func.__signature__.parameters
+        
+        # Check required parameter (should not use Annotated)
+        required_param = params.get("required_param")
+        self.assertIsNotNone(required_param)
+        self.assertEqual(required_param.annotation, str)
+        
+        # Check optional parameter (should use Annotated with Field)
+        optional_param = params.get("optional_param")
+        self.assertIsNotNone(optional_param)
+        
+        # Verify it uses Annotated
+        self.assertEqual(get_origin(optional_param.annotation), Annotated)
+        
+        # Get the args of Annotated
+        args = get_args(optional_param.annotation)
+        self.assertEqual(len(args), 2)
+        self.assertEqual(args[0], str)  # First arg should be the type (str)
+        
+        # Check if the Field has the expected attributes
+        self.assertTrue(hasattr(args[1], "description"))
+        
+        # Check if the default value is None
+        self.assertEqual(optional_param.default, None)
+
+
 def test_hello_world():
     """Basic test to verify test setup is working"""
     assert True, "Hello world test passes"
