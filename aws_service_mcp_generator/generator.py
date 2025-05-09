@@ -10,9 +10,9 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
 # Defining type alias
-BOTO3_CLIENT_GETTER = Callable[[str], boto3.client]
+BOTO3_CLIENT_GETTER = Callable[[str], Any]
 OVERRIDE_FUNC_TYPE = Callable[[FastMCP, BOTO3_CLIENT_GETTER, str], None]
-VALIDATOR = Callable[[FastMCP, boto3.client, Dict[str, Any]], tuple[bool, str|None]]
+VALIDATOR = Callable[[FastMCP, Any, Dict[str, Any]], tuple[bool, str|None]]
 
 class ToolConfiguration(TypedDict):
     ignore: bool | None

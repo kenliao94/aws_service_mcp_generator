@@ -5,12 +5,10 @@ description = "A Python class that generates MCP server for any AWS service whic
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    {name = "Ken Liao", email="kenliao94@gmail.com"},
-    {name = "Hashim Abusharkh", email="hashimabusharkh@gmail.com"},
+    {name = "Ken Liao, Hashim Abusharkh", email = "kenliao94@gmail.com"},
 ]
 maintainers = [
-    {name = "Ken Liao", email = "kenliao94@gmail.com" },
-    {name = "Hashim Abusharkh", email="hashimabusharkh@gmail.com"},
+    {name = "Ken Liao, Hashim Abusharkh", email = "kenliao94@gmail.com" },
 ]
 license = { text = "Apache-2.0" }
 classifiers = [
