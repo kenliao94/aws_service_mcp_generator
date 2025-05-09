@@ -162,7 +162,7 @@ class AWSToolGenerator:
                     name="region",
                     kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
                     annotation=Annotated[
-                        str, Field(description="AWS region on which the broker is in")
+                        str, Field(description="AWS region")
                     ],
                     default="us-east-1",
                 )
