@@ -561,7 +561,7 @@ class TestAWSToolGenerator(unittest.TestCase):
         # Get the args of Annotated
         args = get_args(optional_param.annotation)
         self.assertEqual(len(args), 2)
-        self.assertEqual(args[0], str)  # First arg should be the type (str)
+        self.assertEqual(args[0], str | None)  # First arg should be the type (str | None)
         
         # Check if the Field has the expected attributes
         self.assertTrue(hasattr(args[1], "description"))
