@@ -1,7 +1,7 @@
 import inspect
 import os
 import sys
-from typing import Annotated, Any, Callable, Dict, List, TypedDict
+from typing import Annotated, Any, Callable, Dict, List
 
 import boto3
 import botocore.session
@@ -14,12 +14,6 @@ BOTO3_CLIENT_GETTER = Callable[[str], Any]
 OVERRIDE_FUNC_TYPE = Callable[[FastMCP, BOTO3_CLIENT_GETTER, str], None]
 VALIDATOR = Callable[[FastMCP, Any, Dict[str, Any]], tuple[bool, str|None]]
 
-class ToolConfiguration(TypedDict):
-    ignore: bool | None
-    func_override: OVERRIDE_FUNC_TYPE | None
-    documentation_override: str | None
-    validator: VALIDATOR | None
-
 
 class AWSToolGenerator:
     """Generic AWS Service Tool that can be used for any AWS service."""
@@ -29,7 +23,7 @@ class AWSToolGenerator:
         service_name: str,
         service_display_name: str,
         mcp: FastMCP,
-        tool_configuration: Dict[str, ToolConfiguration] = None,
+        tool_configuration: Dict[str, Dict[str, Any]] = None,
         skip_param_documentation: bool = False,
     ):
         """
@@ -43,7 +37,7 @@ class AWSToolGenerator:
         self.service_name = service_name
         self.service_display_name = service_display_name or service_name.upper()
         self.mcp = mcp
-        self.clients: Dict[str, boto3.client] = dict()
+        self.clients: Dict[str, Any] = dict()
         self.tool_configuration = tool_configuration or dict()
         self.skip_param_documentation = skip_param_documentation
         self.__validate_tool_configuration()
