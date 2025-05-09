@@ -144,10 +144,10 @@ class AWSToolGenerator:
                             name=param_name,
                             kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
                             annotation=Annotated[
-                                type_conversion.get(param_type, str),
+                                type_conversion.get(param_type, str) | None,
                                 Field(description=param_documentation),
-                            ],
-                            default=None,
+                            ], 
+                            default=None
                         )
                     )
             # Add region to dynamically change region such that one MCP server can interact with multiple region
@@ -176,7 +176,7 @@ class AWSToolGenerator:
                 # getting the client that correspond to the region
                 client = self.__get_client(bound_args.arguments["region"])
                 method = getattr(client, operation)
-                kwargs = bound_args.arguments
+                kwargs = {k: v for k, v in bound_args.arguments.items() if v is not None}
                 del kwargs["region"]  # region is not a valid argument to the boto3 API
                 if validator is not None:
                     status, msg = validator(self.mcp, client, kwargs)
