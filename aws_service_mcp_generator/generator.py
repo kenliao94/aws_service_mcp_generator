@@ -262,6 +262,7 @@ class AWSToolGenerator:
                 )
             if (
                 configuration.get("func_override") is None
+                and configuration.get("name_override") is None
                 and configuration.get("documentation_override") is None
                 and configuration.get("ignore") is None
                 and configuration.get("validator") is None
