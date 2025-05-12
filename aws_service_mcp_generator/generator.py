@@ -64,6 +64,7 @@ class AWSToolGenerator:
                     continue
                 func = self.__create_operation_function(
                     operation,
+                    config.get("name_override"),
                     config.get("documentation_override"),
                     config.get("validator"),
                 )
@@ -108,6 +109,7 @@ class AWSToolGenerator:
     def __create_operation_function(
         self,
         operation: str,
+        name_override: str | None = None,
         documentation_override: str | None = None,
         validator: VALIDATOR | None = None,
     ) -> Callable | None:
@@ -193,7 +195,7 @@ class AWSToolGenerator:
                 return {"error": str(e)}
 
         # Set function metadata
-        operation_function.__name__ = f"{operation}"
+        operation_function.__name__ = name_override if name_override is not None else f"{operation}"
         # Set docstring of the tool which is used as part of the prompt for the LLM
         tool_description = (
             (f"Execute the AWS {self.service_display_name} `{operation}` operation.")
