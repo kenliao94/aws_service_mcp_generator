@@ -1,6 +1,6 @@
 [project]
 name = "aws_service_mcp_generator"
-version = "2.0.2"
+version = "2.0.3"
 description = "A Python class that generates MCP server for any AWS service which has boto3 client"
 readme = "README.md"
 requires-python = ">=3.10"
